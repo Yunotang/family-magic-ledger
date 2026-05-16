@@ -1,0 +1,16 @@
+# Python
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/.env
+backend/family_finance.db
+
+# Node
+magic-ledger-app/node_modules/
+magic-ledger-app/dist/
+magic-ledger-app/.env*
+!magic-ledger-app/.env.example
+
+# OS
+.DS_Store
+Thumbs.db

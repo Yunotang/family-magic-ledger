@@ -1,0 +1,6 @@
+{
+  "name": "Magic Ledger App",
+  "description": "A functional front-end mock for a magical family ledger allowing swift input, AI scanning (mocked logic), statistic reports, and transaction details listing.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
