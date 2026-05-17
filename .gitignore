@@ -4,6 +4,7 @@ backend/__pycache__/
 backend/*.pyc
 backend/.env
 backend/family_finance.db
+backend/static/uploads/
 
 # Node
 magic-ledger-app/node_modules/

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 import shutil
 import os
 import uuid
-from ..services import ocr_service
+from ..services import ocr_service, ai_service
 from ..core.config import settings
 from .auth import get_current_user
 from ..models import models
@@ -24,18 +24,19 @@ async def upload_receipt(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
         
-    ocr_result = ocr_service.perform_ocr(file_path)
+    # 優先使用 Google AI 進行深度分析
+    ai_result = await ai_service.analyze_receipt_with_ai(file_path)
     
-    if not ocr_result:
-        # Fallback or error
+    if ai_result:
         return {
             "image_url": f"/static/uploads/{unique_filename}",
-            "detected_amount": 0.0,
-            "detected_date": None,
-            "suggested_category": "Other"
+            **ai_result
         }
         
+    # 如果 AI 失敗或沒 Key，回退到 Tesseract
+    ocr_result = ocr_service.perform_ocr(file_path)
+    
     return {
         "image_url": f"/static/uploads/{unique_filename}",
-        **ocr_result
+        **(ocr_result or {"detected_amount": 0.0, "detected_date": None, "suggested_category": "Other"})
     }

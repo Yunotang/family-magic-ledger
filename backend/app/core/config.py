@@ -12,6 +12,8 @@ class Settings:
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
     
     TESSERACT_CMD: str = os.getenv("TESSERACT_CMD", r"C:\Program Files\Tesseract-OCR\tesseract.exe")
+    GOOGLE_API_KEY: str = os.getenv("GOOGLE_API_KEY", "")
+    AI_MODEL_NAME: str = os.getenv("AI_MODEL_NAME", "gemini-1.5-flash")
     UPLOAD_DIR: str = "static/uploads"
 
 settings = Settings()

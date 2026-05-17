@@ -18,6 +18,7 @@ export function Dashboard() {
         setSummary(summaryData);
         
         const txData = await apiFetch('/transactions');
+
         setRecentTransactions(txData.slice(0, 3));
       } catch (err: any) {
         console.log("偵測到尚未建立家庭 (404)，切換至建立畫面");

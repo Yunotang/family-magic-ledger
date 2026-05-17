@@ -122,6 +122,11 @@ export function AIScanner() {
                   <span className="text-base">{ocrResult.suggested_category}</span>
                 </div>
 
+                <div className="flex items-center justify-between border border-surface-variant rounded-xl p-3 bg-surface-container-lowest">
+                  <span className="text-sm font-medium text-castle-gray">摘要</span>
+                  <span className="text-base">{ocrResult.description || '無描述'}</span>
+                </div>
+
                 <div className="flex items-center justify-between border-2 border-mickey-red/20 rounded-xl p-4 bg-error-container/20">
                   <span className="text-sm font-medium text-castle-gray">金額</span>
                   <span className="text-2xl font-extrabold text-mickey-red flex items-center gap-1"><span className="text-lg">$</span>{ocrResult.detected_amount?.toLocaleString()}</span>
