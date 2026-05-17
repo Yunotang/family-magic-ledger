@@ -37,3 +37,17 @@ def get_summary(
         "balance": float(total_income + total_expenses),
         "categories": category_summary
     }
+
+@router.get("/analysis")
+async def get_ai_analysis(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    summary = get_summary(db, current_user)
+    if not summary["categories"]:
+        return {"analysis": "目前還沒有足夠的資料可以進行魔法分析，請先多記幾筆帳吧！"}
+    
+    # 調用 AI 服務生成報告
+    from ..services import ai_service
+    report = await ai_service.analyze_finances_with_ai(summary)
+    return {"analysis": report}

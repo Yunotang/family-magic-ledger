@@ -8,6 +8,7 @@ export function AIScanner() {
   const [ocrResult, setOcrResult] = useState<any>(null);
   const [isPublic, setIsPublic] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [inputText, setInputText] = useState('');
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -22,7 +23,6 @@ export function AIScanner() {
     try {
       const data = await apiFetch('/ocr/upload', {
         method: 'POST',
-        headers: {}, // fetch will set boundary for FormData
         body: formData,
       });
       setOcrResult(data);
@@ -36,17 +36,40 @@ export function AIScanner() {
     }
   };
 
+  const handleTextSubmit = async () => {
+    if (!inputText.trim()) return;
+    
+    setLoading(true);
+    setStep(1);
+    
+    try {
+      const data = await apiFetch('/ai-chat/text', {
+        method: 'POST',
+        body: JSON.stringify({ text: inputText }),
+      });
+      setOcrResult(data);
+      setStep(2);
+      setInputText('');
+    } catch (err) {
+      console.error(err);
+      alert('解析失敗，請換個說法試試');
+      setStep(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSave = async () => {
     try {
       await apiFetch('/transactions', {
         method: 'POST',
         body: JSON.stringify({
-          amount: ocrResult.detected_amount,
-          category: ocrResult.suggested_category || 'Shopping',
+          amount: parseFloat(String(ocrResult.detected_amount)) * -1, // Expenses are negative
+          category: ocrResult.suggested_category || 'Other',
           is_public: isPublic,
-          description: `AI 辨識收據`,
+          description: ocrResult.description || `AI 辨識結果`,
           trans_date: ocrResult.detected_date ? new Date(ocrResult.detected_date).toISOString() : new Date().toISOString(),
-          image_url: ocrResult.image_url
+          image_url: ocrResult.image_url || null
         }),
       });
       navigate('/transactions');
@@ -90,13 +113,13 @@ export function AIScanner() {
         {step >= 1 && (
           <div className="flex gap-4 items-start w-full justify-end animate-in fade-in slide-in-from-bottom-4 duration-300">
             <div className="bg-sorcerer-blue text-on-primary rounded-2xl rounded-tr-sm p-3 shadow-md flex items-center gap-2">
-              <span className="material-symbols-outlined text-sm">{loading ? 'sync' : 'receipt_long'}</span>
-              <span className="font-medium text-sm">{loading ? '辨識中...' : '收據已上傳'}</span>
+              <span className="material-symbols-outlined text-sm">{loading ? 'sync' : 'check'}</span>
+              <span className="font-medium text-sm">{loading ? '魔法解析中...' : '已收到資訊'}</span>
             </div>
           </div>
         )}
 
-        {/* Chat message 2 - analyzing / result */}
+        {/* Chat message 2 - result */}
         {step >= 2 && ocrResult && (
           <div className="flex gap-4 items-start w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="w-10 h-10 rounded-full bg-mickey-red text-on-primary flex items-center justify-center flex-shrink-0">
@@ -107,14 +130,13 @@ export function AIScanner() {
               
               <div className="bg-white border-2 border-surface-variant rounded-[20px] p-5 flex flex-col gap-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="material-symbols-outlined text-sorcerer-blue">receipt_long</span>
-                  <h2 className="text-base font-bold text-sorcerer-blue">AI 辨識結果</h2>
-                  <span className="bg-secondary-fixed text-on-secondary-fixed text-xs px-2 py-1 rounded-full ml-auto font-medium">AI 輔助中</span>
+                  <span className="material-symbols-outlined text-sorcerer-blue">auto_awesome</span>
+                  <h2 className="text-base font-bold text-sorcerer-blue">AI 解析結果</h2>
                 </div>
 
                 <div className="flex items-center justify-between border border-surface-variant rounded-xl p-3 bg-surface-container-lowest">
                   <span className="text-sm font-medium text-castle-gray">日期</span>
-                  <span className="text-base">{ocrResult.detected_date || '未偵測到'}</span>
+                  <span className="text-base">{ocrResult.detected_date || '今天'}</span>
                 </div>
                 
                 <div className="flex items-center justify-between border border-surface-variant rounded-xl p-3 bg-surface-container-lowest">
@@ -124,7 +146,7 @@ export function AIScanner() {
 
                 <div className="flex items-center justify-between border border-surface-variant rounded-xl p-3 bg-surface-container-lowest">
                   <span className="text-sm font-medium text-castle-gray">摘要</span>
-                  <span className="text-base">{ocrResult.description || '無描述'}</span>
+                  <span className="text-base">{ocrResult.description}</span>
                 </div>
 
                 <div className="flex items-center justify-between border-2 border-mickey-red/20 rounded-xl p-4 bg-error-container/20">
@@ -143,7 +165,7 @@ export function AIScanner() {
 
                 <button onClick={handleSave} className="w-full bg-mickey-red text-on-primary py-4 rounded-xl shadow-md hover:scale-[0.98] transition-transform flex items-center justify-center gap-2 mt-4 font-bold">
                   <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                  施法完畢，儲存！
+                  確認並儲存
                 </button>
               </div>
             </div>
@@ -158,10 +180,17 @@ export function AIScanner() {
         </button>
         <input 
           type="text" 
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleTextSubmit()}
           placeholder="輸入：「今天在全聯花了 1250 元」..."
           className="flex-1 bg-transparent border-none focus:outline-none text-base px-2"
         />
-        <button className="w-10 h-10 rounded-full bg-sorcerer-blue text-on-primary flex items-center justify-center">
+        <button 
+          onClick={handleTextSubmit}
+          disabled={loading || !inputText.trim()}
+          className="w-10 h-10 rounded-full bg-sorcerer-blue text-on-primary flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           <span className="material-symbols-outlined text-[20px]">send</span>
         </button>
       </div>

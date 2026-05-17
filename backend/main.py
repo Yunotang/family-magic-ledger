@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.database import engine, Base
-from app.api import auth, households, transactions, ocr, reports
+from app.api import auth, households, transactions, ocr, reports, ai_chat # Added ai_chat
 import os
 
 # Initialize Database
@@ -34,3 +34,4 @@ app.include_router(households.router, prefix="/api/v1/households", tags=["househ
 app.include_router(transactions.router, prefix="/api/v1/transactions", tags=["transactions"])
 app.include_router(ocr.router, prefix="/api/v1/ocr", tags=["ocr"])
 app.include_router(reports.router, prefix="/api/v1/reports", tags=["reports"])
+app.include_router(ai_chat.router, prefix="/api/v1/ai-chat", tags=["ai-chat"])
