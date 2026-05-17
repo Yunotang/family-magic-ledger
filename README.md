@@ -1,20 +1,26 @@
-# Family Magic Ledger (家庭透明化記帳系統)
+# Family Magic Ledger (家庭透明化記帳系統) V2.0
 
-![Screenshot](assets/screenshot.png)
+![Main Screenshot](assets/screenshot.png)
 
-這是一個專為家庭設計的透明化記帳系統，支援 AI OCR 收據辨識、公私帳隔離以及視覺化財務報表。
+這是一個專為家庭設計的專業級透明化 AI 記帳系統，採用 FastAPI + React 現代分層架構，整合 Google Gemini 頂尖人工智慧，平衡隱私與協作。
 
-## ✨ 核心特色
-- **AI 魔法掃描**：拍照即辨識，自動提取收據金額與日期。
-- **透明化協作**：家庭成員共享帳本，公私帳一鍵切換，平衡隱私與透明。
-- **極簡輸入**：專為行動端優化的自定義虛擬鍵盤，3 秒完成記帳。
-- **視覺化報表**：直觀的支出分佈與趨勢分析。
+## ✨ V2.0 核心特色
+- **AI 魔法理財顧問**：動態分析全家支出，提供深度財務洞察與省錢建議。
+- **專業分層架構**：嚴謹的 API、Service、Data、Schema 分層設計，具備商業級擴展性。
+- **極速 AI 掃描**：整合 Gemini 2.0/2.5 Flash，秒級辨識收據並自動分類。
+- **安全性強化**：環境變數強型別驗證，API Key 後端代理隔離，確保金鑰零外洩。
 
-## 🛠️ 技術棧
+### 🪄 AI 財務分析展示
+![AI Advisor](assets/advisor_screenshot.png)
+
+---
+
+## 🛠️ 專業技術棧
 - **Frontend**: React, Vite, Tailwind CSS, shadcn/ui
-- **Backend**: FastAPI (Python), SQLAlchemy, JWT
+- **Backend**: FastAPI (Python), SQLAlchemy, Pydantic Settings
+- **Security**: JWT (Jose), Bcrypt (Passlib)
+- **AI Engine**: Google Gen AI SDK (Gemini 2.0/2.5 Flash)
 - **Database**: SQLite
-- **OCR**: Tesseract OCR
 
 ---
 
@@ -26,24 +32,21 @@ graph TD
     Auth -->|發放 JWT| User
     
     User -->|2. 建立家庭| HH(Household 模組)
-    HH -->|產生邀請碼| User
     
-    subgraph 記帳流程
-        User -->|3a. 上傳收據| OCR(AI OCR 服務)
-        OCR -->|自動提取| Preview[預覽確認]
-        Preview -->|儲存| Ledger(Ledger 模組)
-        
-        User -->|3b. 手動輸入| Ledger
+    subgraph 專業記帳流
+        User -->|3a. 上傳收據| AI_OCR(Gemini 視覺辨識)
+        User -->|3b. 文字記帳| AI_NLU(Gemini 自然語言解析)
+        AI_OCR -->|結構化 JSON| Ledger
+        AI_NLU -->|結構化 JSON| Ledger
     end
     
     Ledger -->|4. 寫入| DB[(SQLite 資料庫)]
     
-    DB -->|5. 讀取| Stats(統計模組)
-    Stats -->|6. 渲染圖表| UI[儀表板/報表]
-    
-    style OCR fill:#f9f,stroke:#333,stroke-width:2px
-    style Auth fill:#dfd,stroke:#333,stroke-width:2px
-    style HH fill:#ddf,stroke:#333,stroke-width:2px
+    subgraph AI 洞察流
+        DB -->|資料彙整| Stats(統計模組)
+        Stats -->|數據請求| AI_Advisor(Gemini 財務顧問)
+        AI_Advisor -->|生成報告| UI[報表中心]
+    end
 ```
 
 ---
@@ -52,22 +55,20 @@ graph TD
 
 ### 後端 (Backend)
 1. 進入 `backend` 目錄
-2. 建立虛擬環境：`python -m venv venv`
-3. 啟動環境：`venv\Scripts\activate`
-4. 安裝套件：`pip install -r requirements.txt`
-5. 啟動伺服器：`uvicorn main:app --reload`
+2. 啟動環境：`venv\Scripts\activate`
+3. 安裝專業版套件：`pip install -r requirements.txt`
+4. 啟動伺服器：`uvicorn main:app --reload`
 
 ### 前端 (Frontend)
 1. 進入 `magic-ledger-app` 目錄
-2. 安裝依賴：`npm install`
-3. 啟動開發環境：`npm run dev`
+2. 啟動開發環境：`npm run dev`
 
 ---
 
-## 📄 專案文件
-- [PRD V1 (產品需求文件)](PRD_V1.md)
-- [SDD V1 (軟體設計文件)](SDD_V1.md)
-- [測試指南](backend/test_api.py)
+## 📄 技術架構文檔
+- [ARCHITECTURE.md (專業架構說明)](ARCHITECTURE.md)
+- [PRD V1 (產品需求)](PRD_V1.md)
+- [SDD V1 (詳細設計)](SDD_V1.md)
 
 ---
-Developed with ✨ by Gemini CLI
+Developed with 💎 & ✨ by Gemini CLI
